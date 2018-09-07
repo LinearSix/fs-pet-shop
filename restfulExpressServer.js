@@ -14,28 +14,23 @@ let bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
- 
-// app.use(function (req, res) {
-//   res.setHeader('Content-Type', 'text/plain')
-//   res.write('you posted:\n')
-//   res.end(JSON.stringify(req.body, null, 2))
-// })
 
 let port = process.env.PORT || 8000;
 
 app.disable('x-powered-by');
 
+// handle root route request
 // PROCESS GET REQUEST WITH NO ID
 app.get('/pets', function(req, res) {
-  fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
-    if (err) {
-      console.error(err.stack);
-      return res.sendStatus(500);
-    }
-    // let pets = JSON.parse(petsJSON);
-    res.set('Content-Type', 'application/json');
-    res.send(petsJSON);
-  });
+    fs.readFile(petsPath, 'utf8', function(err, petsJSON) {
+        if (err) {
+        console.error(err.stack);
+        return res.sendStatus(500);
+        };
+        // let pets = JSON.parse(petsJSON);
+        res.set('Content-Type', 'application/json');
+        res.send(petsJSON);
+    });
 });
 
 // PROCESS GET REQUEST WITH ID
@@ -96,9 +91,9 @@ app.patch('/pets/:id', function (req, res) {
             return res.sendStatus(404);
         };
         let recordNew = new Object();
-            recordNew.age = Number(req.body.age);
-            recordNew.kind = req.body.kind;
-            recordNew.name = req.body.name;
+            recordNew.age = (Number(req.body.age) ? Number(req.body.age) : pets[id].age);
+            recordNew.kind = (req.body.kind ? req.body.kind : pets[id].kind);
+            recordNew.name = (req.body.name ? req.body.name : pets[id].name);
         pets.splice(id, 1, recordNew);
             
         fs.writeFile('pets.json', JSON.stringify(pets), (err) => {
@@ -112,20 +107,23 @@ app.patch('/pets/:id', function (req, res) {
 
 app.delete('/pets/:id', function (req, res) {
     fs.readFile(petsPath, 'utf8', (err, petsJSON) => {
+        if (err) {
+            console.error(err.stack);
+            res.set('Content-Type', 'application/json');
+            return res.sendStatus(500);
+        };
         let id = Number.parseInt(req.params.id);
         let pets = JSON.parse(petsJSON);
         if (id < 0 || id >= pets.length || Number.isNaN(id)) {
             return res.sendStatus(404);
         };
+        let deletedRecord = pets[id];
         pets.splice(id, 1);
         fs.writeFile('pets.json', JSON.stringify(pets), (err) => {
-        res.send('Record Deleted');
+        res.set('Content-Type', 'application/json');
+        res.send(deletedRecord);
         });
     });
-});
-
-app.use(function(req, res) {
-  res.sendStatus(404);
 });
 
 app.listen(port, function() {
