@@ -1,12 +1,12 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var petsPath = path.join(__dirname, 'pets.json');
+let fs = require('fs');
+let path = require('path');
+let petsPath = path.join(__dirname, 'pets.json');
 
-var express = require('express');
-var app = express();
-var port = process.env.PORT || 8000;
+let express = require('express');
+let app = express();
+let port = process.env.PORT || 8000;
 
 app.disable('x-powered-by');
 
@@ -17,7 +17,7 @@ app.get('/pets', function(req, res) {
       return res.sendStatus(500);
     }
 
-    var pets = JSON.parse(petsJSON);
+    let pets = JSON.parse(petsJSON);
 
     res.send(pets);
   });
@@ -30,8 +30,8 @@ app.get('/pets/:id', function(req, res) {
       return res.sendStatus(500);
     }
 
-    var id = Number.parseInt(req.params.id);
-    var pets = JSON.parse(petsJSON);
+    let id = Number.parseInt(req.params.id);
+    let pets = JSON.parse(petsJSON);
 
     if (id < 0 || id >= pets.length || Number.isNaN(id)) {
       return res.sendStatus(404);

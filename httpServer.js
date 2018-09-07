@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const port = process.env.PORT || 8000;
 
 // create a server
 const server = http.createServer((request, response) => {
@@ -50,9 +51,11 @@ const server = http.createServer((request, response) => {
 
                 request.on('data', function (chunk) {
                     body += chunk;
+                    //console.log(chunk);
                 });
                 request.on('end', function () {
                     let parsedBody = JSON.parse(body);
+                    console.log(parsedBody);
                     let recordNew = new Object();
                         recordNew.age = Number(parsedBody.age);
                         recordNew.kind = parsedBody.kind;
@@ -126,7 +129,7 @@ const server = http.createServer((request, response) => {
     };
 });
 
-server.listen(8000, () => {
+server.listen(port, () => {
     console.log('server is on')
 });
 
